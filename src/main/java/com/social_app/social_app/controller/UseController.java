@@ -1,6 +1,8 @@
 package com.social_app.social_app.controller;
 
 import com.social_app.social_app.models.User;
+import com.social_app.social_app.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -8,6 +10,9 @@ import java.util.List;
 
 @RestController
 public class UseController {
+    @Autowired
+    UserRepository userRepository;
+
     @GetMapping("/users")
     public List<User> getUsers(){
         List<User> users = new ArrayList<>();
@@ -23,17 +28,20 @@ public class UseController {
         user.setId(id);
         return user;
     }
+
+
     @PostMapping("/users")
     public User createUser(@RequestBody User user){
         User newUser = new User();
         newUser.setEmail(user.getEmail());
         newUser.setLastName(user.getLastName());
-
         newUser.setFirstName(user.getFirstName());
         newUser.setPassword(user.getPassword());
         newUser.setId(user.getId());
 
-        return newUser;
+        User savedUser = userRepository.save(newUser);
+
+        return savedUser;
     }
     @PutMapping("/users")
     public User updateUser(@RequestBody User user){
