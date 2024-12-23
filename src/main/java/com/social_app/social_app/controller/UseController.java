@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 public class UseController {
@@ -15,18 +16,16 @@ public class UseController {
 
     @GetMapping("/users")
     public List<User> getUsers(){
-        List<User> users = new ArrayList<>();
-        User user = new User(1,"ivan","ivanov","ivan@gmail.com", "pass123");
-        User user1 = new User(2, "petko","ivanov","petko@gmail.com", "pass123");
-        users.add(user);
-        users.add(user1);
+        List<User> users = userRepository.findAll();
         return users;
     }
     @GetMapping("/users/{userId}")
-    public User getUserById(@PathVariable("userId") Integer id){
-        User user = new User(1,"ivan","ivanov","ivan@gmail.com", "pass123");
-        user.setId(id);
-        return user;
+    public User getUserById(@PathVariable("userId") Integer id) throws Exception{
+        User user = userRepository.findById(id).orElse(null);
+        if(user != null){
+            return user;
+        }
+        throw new Exception("User with id " + id + " not found");
     }
 
 
@@ -43,23 +42,32 @@ public class UseController {
 
         return savedUser;
     }
-    @PutMapping("/users")
-    public User updateUser(@RequestBody User user){
-        User user1 = new User(6, "ico", "ivanov", "ico@gmail.com", "pass123");
+    @PutMapping("/users/{userId}")
+    public User updateUser(@RequestBody User user, @PathVariable Integer userId) throws Exception{
+        User user1 = userRepository.findById(userId).orElse(null);
+        if(user1 == null){
+            throw new Exception("User does not exist with id: " + userId);
+        }
+        User previousUser = user1;
         if(user.getFirstName() != null){
-            user1.setFirstName(user.getFirstName());
+            previousUser.setFirstName(user.getFirstName());
         }
         if(user.getLastName() != null){
-            user1.setLastName(user.getLastName());
+            previousUser.setLastName(user.getLastName());
         }
         if(user.getEmail() != null){
-            user1.setEmail(user.getEmail());
+            previousUser.setEmail(user.getEmail());
         }
-
-        return user1;
+        User updatedUser = userRepository.save(previousUser);
+        return updatedUser;
     }
     @DeleteMapping("users/{userId}")
-    public String deleteUser(@PathVariable ("userId") Integer userId){
-        return "User deleted successfully with id: " + userId;
+    public String deleteUser(@PathVariable ("userId") Integer userId) throws Exception{
+        User user = userRepository.findById(userId).orElse(null);
+        if(user == null){
+            throw new Exception("User with id " + userId + " not found");
+        }
+        userRepository.delete(user);
+        return "User with id " + userId + " deleted successfully!";
     }
 }
