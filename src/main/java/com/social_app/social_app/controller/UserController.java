@@ -1,54 +1,49 @@
-package com.social_app.social_app.controller;
+package com. social_app. social_app. controller;
 
 import com.social_app.social_app.models.User;
 import com.social_app.social_app.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
-public class UseController {
+public class UserController {
     @Autowired
-    UserRepository userRepository;
+    private UserRepository userRepository;
 
     @GetMapping("/users")
-    public List<User> getUsers(){
+    public List<User> getAllUsers(){
         List<User> users = userRepository.findAll();
-        return users;
+        return  users;
     }
+
     @GetMapping("/users/{userId}")
-    public User getUserById(@PathVariable("userId") Integer id) throws Exception{
+    public User getUser(@PathVariable ("userId") Integer id) throws Exception{
         User user = userRepository.findById(id).orElse(null);
-        if(user != null){
-            return user;
+        if(user == null){
+            throw new Exception("User with id " + id + " not found");
         }
-        throw new Exception("User with id " + id + " not found");
+        return user;
     }
-
-
     @PostMapping("/users")
     public User createUser(@RequestBody User user){
         User newUser = new User();
-        newUser.setEmail(user.getEmail());
-        newUser.setLastName(user.getLastName());
         newUser.setFirstName(user.getFirstName());
+        newUser.setLastName(user.getLastName());
+        newUser.setEmail(user.getEmail());
         newUser.setPassword(user.getPassword());
         newUser.setId(user.getId());
-
-        User savedUser = userRepository.save(newUser);
-
-        return savedUser;
+        return userRepository.save(newUser);
     }
     @PutMapping("/users/{userId}")
-    public User updateUser(@RequestBody User user, @PathVariable Integer userId) throws Exception{
-        User user1 = userRepository.findById(userId).orElse(null);
-        if(user1 == null){
-            throw new Exception("User does not exist with id: " + userId);
+    public User updateUser(@RequestBody User user, @PathVariable ("userId") Integer id) throws Exception{
+        User currentUser = userRepository.findById(id).orElse(null);
+        if(currentUser == null){
+            throw new Exception("User with id " + id + " not found");
         }
-        User previousUser = user1;
+        User previousUser = currentUser;
+
         if(user.getFirstName() != null){
             previousUser.setFirstName(user.getFirstName());
         }
@@ -61,13 +56,13 @@ public class UseController {
         User updatedUser = userRepository.save(previousUser);
         return updatedUser;
     }
-    @DeleteMapping("users/{userId}")
-    public String deleteUser(@PathVariable ("userId") Integer userId) throws Exception{
-        User user = userRepository.findById(userId).orElse(null);
+    @DeleteMapping("/users/{userId}")
+    public String deleteUser(@PathVariable ("userId") Integer id) throws Exception{
+        User user = userRepository.findById(id).orElse(null);
         if(user == null){
-            throw new Exception("User with id " + userId + " not found");
+            throw new Exception("User with id " + id + " not found");
         }
         userRepository.delete(user);
-        return "User with id " + userId + " deleted successfully!";
+        return "User with id " + id + " deleted successfully!";
     }
 }
