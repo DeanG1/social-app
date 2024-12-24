@@ -1,10 +1,10 @@
 package com.social_app.social_app.models;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 @Entity
@@ -26,12 +26,23 @@ public class User {
     private List<Integer> followers = new ArrayList<>();
     @ElementCollection
     private List<Integer> followings = new ArrayList<>();
+    @OneToMany(mappedBy = "user")
+    @JsonIgnore // Prevent cyclic serialization
+    private List<Post> posts = new ArrayList<>();
 
+    @ManyToMany
+    @JoinTable(
+            name = "saved_posts",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "post_id")
+    )
+    @JsonIgnore // Prevent cyclic serialization
+    private List<Post> savedPost = new ArrayList<>();
     public User(){
 
     }
 
-    public User(Integer id, String firstName, String lastName, String email, String password, String gender, List<Integer> followers, List<Integer> followings) {
+    public User(Integer id, String firstName, String lastName, String email, String password, String gender, List<Integer> followers, List<Integer> followings, List<Post> savedPosts) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -40,6 +51,15 @@ public class User {
         this.gender = gender;
         this.followers = followers;
         this.followings = followings;
+        this.savedPost = savedPosts;
+    }
+
+    public List<Post> getSavedPosts() {
+        return savedPost;
+    }
+
+    public void setSavedPosts(List<Post> savedPosts) {
+        this.savedPost = savedPosts;
     }
 
     public Integer getId() {
