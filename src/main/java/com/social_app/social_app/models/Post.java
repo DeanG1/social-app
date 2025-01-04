@@ -17,7 +17,6 @@ public class Post {
     private String video;
     @JsonIgnore
     @ManyToOne
-    //dsadasd
     private User user;
     @JsonIgnore
     @OneToMany
