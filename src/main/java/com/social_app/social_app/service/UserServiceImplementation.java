@@ -4,6 +4,7 @@ import com.social_app.social_app.models.User;
 import com.social_app.social_app.repository.UserRepository;
 import org.hibernate.id.IntegralDataTypeHolder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,13 +15,19 @@ public class UserServiceImplementation implements UserService {
     @Autowired
     UserRepository userRepository;
 
+    @Autowired
+    PasswordEncoder passwordEncoder;
+
     @Override
     public User registerUser(User user) {
         User newUser = new User();
         newUser.setFirstName(user.getFirstName());
         newUser.setLastName(user.getLastName());
         newUser.setEmail(user.getEmail());
-        newUser.setPassword(user.getPassword());
+        newUser.setPassword(passwordEncoder.encode(user.getPassword()));
+        newUser.setFollowers(user.getFollowers());
+        newUser.setFollowings(user.getFollowings());
+        newUser.setGender(user.getGender());
         newUser.setId(user.getId());
         User savedUser = userRepository.save(newUser);
         return savedUser;

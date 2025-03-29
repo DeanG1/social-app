@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Table(name="posts")
 public class Post {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,7 +25,6 @@ public class Post {
     private LocalDateTime createdAt;
 
     public Post(){
-
     }
 
     public Post(Integer id, String caption, String image, String video, User user, List<User> liked, LocalDateTime createdAt) {
