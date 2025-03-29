@@ -28,11 +28,7 @@ public class UserController {
         User user = userService.findUserById(id);
         return user;
     }
-    @PostMapping("/users")
-    public User createUser(@RequestBody User user){
-         User savedUser = userService.registerUser(user);
-         return savedUser;
-    }
+
     @PutMapping("/api/users/{userId}")
     public User updateUser(@RequestBody User user, @PathVariable ("userId") Integer id) throws Exception{
         User updatedUser = userService.updateUser(user, id);
